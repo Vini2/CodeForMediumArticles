@@ -1,0 +1,459 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Label Propagation Test"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Create the graph"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<igraph.Graph at 0x7fa7442cb350>"
+      ]
+     },
+     "execution_count": 1,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "from igraph import *\n",
+    "\n",
+    "node_count = 7\n",
+    "\n",
+    "# Create graph\n",
+    "g = Graph()\n",
+    "\n",
+    "# Add vertices\n",
+    "g.add_vertices(node_count)\n",
+    "\n",
+    "for i in range(len(g.vs)):\n",
+    "    g.vs[i][\"id\"]= i\n",
+    "    g.vs[i][\"label\"]= str(i+1)\n",
+    "\n",
+    "edges = [(0,3), (2,3), (3,4), (4,5), (5,6), (5,1)]\n",
+    "\n",
+    "g.add_edges(edges)\n",
+    "\n",
+    "g.simplify(multiple=True, loops=False, combine_edges=None)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/svg+xml": [
+       "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+       "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"500pt\" height=\"500pt\" viewBox=\"0 0 500 500\" version=\"1.1\">\n",
+       "<defs>\n",
+       "<g>\n",
+       "<symbol overflow=\"visible\" id=\"glyph0-0\">\n",
+       "<path style=\"stroke:none;\" d=\"M 0.40625 1.421875 L 0.40625 -5.640625 L 4.40625 -5.640625 L 4.40625 1.421875 Z M 0.84375 0.96875 L 3.953125 0.96875 L 3.953125 -5.1875 L 0.84375 -5.1875 Z M 0.84375 0.96875 \"/>\n",
+       "</symbol>\n",
+       "<symbol overflow=\"visible\" id=\"glyph0-1\">\n",
+       "<path style=\"stroke:none;\" d=\"M 1 -0.671875 L 2.28125 -0.671875 L 2.28125 -5.109375 L 0.875 -4.828125 L 0.875 -5.546875 L 2.28125 -5.828125 L 3.0625 -5.828125 L 3.0625 -0.671875 L 4.359375 -0.671875 L 4.359375 0 L 1 0 Z M 1 -0.671875 \"/>\n",
+       "</symbol>\n",
+       "<symbol overflow=\"visible\" id=\"glyph0-2\">\n",
+       "<path style=\"stroke:none;\" d=\"M 1.53125 -0.671875 L 4.296875 -0.671875 L 4.296875 0 L 0.59375 0 L 0.59375 -0.671875 C 0.882812 -0.972656 1.289062 -1.382812 1.8125 -1.90625 C 2.332031 -2.4375 2.65625 -2.773438 2.78125 -2.921875 C 3.039062 -3.203125 3.21875 -3.441406 3.3125 -3.640625 C 3.414062 -3.835938 3.46875 -4.03125 3.46875 -4.21875 C 3.46875 -4.53125 3.359375 -4.785156 3.140625 -4.984375 C 2.921875 -5.179688 2.640625 -5.28125 2.296875 -5.28125 C 2.046875 -5.28125 1.78125 -5.234375 1.5 -5.140625 C 1.226562 -5.054688 0.9375 -4.925781 0.625 -4.75 L 0.625 -5.546875 C 0.945312 -5.679688 1.242188 -5.78125 1.515625 -5.84375 C 1.796875 -5.90625 2.050781 -5.9375 2.28125 -5.9375 C 2.882812 -5.9375 3.363281 -5.785156 3.71875 -5.484375 C 4.082031 -5.179688 4.265625 -4.78125 4.265625 -4.28125 C 4.265625 -4.039062 4.21875 -3.8125 4.125 -3.59375 C 4.03125 -3.375 3.867188 -3.117188 3.640625 -2.828125 C 3.566406 -2.753906 3.351562 -2.535156 3 -2.171875 C 2.65625 -1.816406 2.164062 -1.316406 1.53125 -0.671875 Z M 1.53125 -0.671875 \"/>\n",
+       "</symbol>\n",
+       "<symbol overflow=\"visible\" id=\"glyph0-3\">\n",
+       "<path style=\"stroke:none;\" d=\"M 3.25 -3.140625 C 3.625 -3.066406 3.914062 -2.898438 4.125 -2.640625 C 4.34375 -2.390625 4.453125 -2.078125 4.453125 -1.703125 C 4.453125 -1.117188 4.253906 -0.671875 3.859375 -0.359375 C 3.460938 -0.046875 2.898438 0.109375 2.171875 0.109375 C 1.921875 0.109375 1.664062 0.0820312 1.40625 0.03125 C 1.15625 -0.0078125 0.890625 -0.078125 0.609375 -0.171875 L 0.609375 -0.9375 C 0.828125 -0.8125 1.066406 -0.710938 1.328125 -0.640625 C 1.585938 -0.578125 1.859375 -0.546875 2.140625 -0.546875 C 2.640625 -0.546875 3.019531 -0.644531 3.28125 -0.84375 C 3.539062 -1.039062 3.671875 -1.328125 3.671875 -1.703125 C 3.671875 -2.046875 3.546875 -2.3125 3.296875 -2.5 C 3.054688 -2.695312 2.722656 -2.796875 2.296875 -2.796875 L 1.625 -2.796875 L 1.625 -3.4375 L 2.328125 -3.4375 C 2.710938 -3.4375 3.007812 -3.515625 3.21875 -3.671875 C 3.425781 -3.828125 3.53125 -4.050781 3.53125 -4.34375 C 3.53125 -4.644531 3.421875 -4.875 3.203125 -5.03125 C 2.992188 -5.195312 2.691406 -5.28125 2.296875 -5.28125 C 2.078125 -5.28125 1.84375 -5.253906 1.59375 -5.203125 C 1.351562 -5.160156 1.082031 -5.085938 0.78125 -4.984375 L 0.78125 -5.6875 C 1.082031 -5.769531 1.363281 -5.832031 1.625 -5.875 C 1.882812 -5.914062 2.132812 -5.9375 2.375 -5.9375 C 2.96875 -5.9375 3.4375 -5.800781 3.78125 -5.53125 C 4.132812 -5.257812 4.3125 -4.890625 4.3125 -4.421875 C 4.3125 -4.097656 4.21875 -3.828125 4.03125 -3.609375 C 3.851562 -3.390625 3.59375 -3.234375 3.25 -3.140625 Z M 3.25 -3.140625 \"/>\n",
+       "</symbol>\n",
+       "<symbol overflow=\"visible\" id=\"glyph0-4\">\n",
+       "<path style=\"stroke:none;\" d=\"M 3.03125 -5.140625 L 1.03125 -2.03125 L 3.03125 -2.03125 Z M 2.8125 -5.828125 L 3.8125 -5.828125 L 3.8125 -2.03125 L 4.640625 -2.03125 L 4.640625 -1.375 L 3.8125 -1.375 L 3.8125 0 L 3.03125 0 L 3.03125 -1.375 L 0.390625 -1.375 L 0.390625 -2.140625 Z M 2.8125 -5.828125 \"/>\n",
+       "</symbol>\n",
+       "<symbol overflow=\"visible\" id=\"glyph0-5\">\n",
+       "<path style=\"stroke:none;\" d=\"M 0.859375 -5.828125 L 3.96875 -5.828125 L 3.96875 -5.171875 L 1.59375 -5.171875 L 1.59375 -3.734375 C 1.707031 -3.773438 1.820312 -3.804688 1.9375 -3.828125 C 2.050781 -3.847656 2.164062 -3.859375 2.28125 -3.859375 C 2.925781 -3.859375 3.4375 -3.675781 3.8125 -3.3125 C 4.195312 -2.957031 4.390625 -2.476562 4.390625 -1.875 C 4.390625 -1.25 4.191406 -0.757812 3.796875 -0.40625 C 3.410156 -0.0625 2.863281 0.109375 2.15625 0.109375 C 1.90625 0.109375 1.65625 0.0859375 1.40625 0.046875 C 1.15625 0.00390625 0.894531 -0.0546875 0.625 -0.140625 L 0.625 -0.9375 C 0.851562 -0.800781 1.09375 -0.703125 1.34375 -0.640625 C 1.59375 -0.578125 1.859375 -0.546875 2.140625 -0.546875 C 2.585938 -0.546875 2.941406 -0.664062 3.203125 -0.90625 C 3.472656 -1.144531 3.609375 -1.46875 3.609375 -1.875 C 3.609375 -2.28125 3.472656 -2.597656 3.203125 -2.828125 C 2.941406 -3.066406 2.585938 -3.1875 2.140625 -3.1875 C 1.929688 -3.1875 1.71875 -3.160156 1.5 -3.109375 C 1.289062 -3.066406 1.078125 -3 0.859375 -2.90625 Z M 0.859375 -5.828125 \"/>\n",
+       "</symbol>\n",
+       "<symbol overflow=\"visible\" id=\"glyph0-6\">\n",
+       "<path style=\"stroke:none;\" d=\"M 2.640625 -3.234375 C 2.285156 -3.234375 2.003906 -3.109375 1.796875 -2.859375 C 1.585938 -2.617188 1.484375 -2.289062 1.484375 -1.875 C 1.484375 -1.457031 1.585938 -1.125 1.796875 -0.875 C 2.003906 -0.632812 2.285156 -0.515625 2.640625 -0.515625 C 2.992188 -0.515625 3.273438 -0.632812 3.484375 -0.875 C 3.691406 -1.125 3.796875 -1.457031 3.796875 -1.875 C 3.796875 -2.289062 3.691406 -2.617188 3.484375 -2.859375 C 3.273438 -3.109375 2.992188 -3.234375 2.640625 -3.234375 Z M 4.203125 -5.703125 L 4.203125 -4.984375 C 4.003906 -5.078125 3.804688 -5.148438 3.609375 -5.203125 C 3.410156 -5.253906 3.210938 -5.28125 3.015625 -5.28125 C 2.492188 -5.28125 2.09375 -5.101562 1.8125 -4.75 C 1.539062 -4.394531 1.382812 -3.863281 1.34375 -3.15625 C 1.5 -3.382812 1.691406 -3.554688 1.921875 -3.671875 C 2.148438 -3.796875 2.40625 -3.859375 2.6875 -3.859375 C 3.269531 -3.859375 3.734375 -3.679688 4.078125 -3.328125 C 4.421875 -2.972656 4.59375 -2.488281 4.59375 -1.875 C 4.59375 -1.269531 4.414062 -0.785156 4.0625 -0.421875 C 3.707031 -0.0664062 3.234375 0.109375 2.640625 0.109375 C 1.960938 0.109375 1.445312 -0.144531 1.09375 -0.65625 C 0.738281 -1.175781 0.5625 -1.925781 0.5625 -2.90625 C 0.5625 -3.832031 0.78125 -4.566406 1.21875 -5.109375 C 1.65625 -5.660156 2.242188 -5.9375 2.984375 -5.9375 C 3.179688 -5.9375 3.378906 -5.914062 3.578125 -5.875 C 3.773438 -5.84375 3.984375 -5.785156 4.203125 -5.703125 Z M 4.203125 -5.703125 \"/>\n",
+       "</symbol>\n",
+       "<symbol overflow=\"visible\" id=\"glyph0-7\">\n",
+       "<path style=\"stroke:none;\" d=\"M 0.65625 -5.828125 L 4.40625 -5.828125 L 4.40625 -5.5 L 2.296875 0 L 1.46875 0 L 3.453125 -5.171875 L 0.65625 -5.171875 Z M 0.65625 -5.828125 \"/>\n",
+       "</symbol>\n",
+       "</g>\n",
+       "</defs>\n",
+       "<g id=\"surface16\">\n",
+       "<rect x=\"0\" y=\"0\" width=\"500\" height=\"500\" style=\"fill:rgb(100%,100%,100%);fill-opacity:1;stroke:none;\"/>\n",
+       "<path style=\"fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(26.666667%,26.666667%,26.666667%);stroke-opacity:1;stroke-miterlimit:10;\" d=\"M 308.929688 17 L 178.898438 111.125 \"/>\n",
+       "<path style=\"fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(26.666667%,26.666667%,26.666667%);stroke-opacity:1;stroke-miterlimit:10;\" d=\"M 483 357.019531 L 321.136719 388.9375 \"/>\n",
+       "<path style=\"fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(26.666667%,26.666667%,26.666667%);stroke-opacity:1;stroke-miterlimit:10;\" d=\"M 17 143.082031 L 178.898438 111.125 \"/>\n",
+       "<path style=\"fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(26.666667%,26.666667%,26.666667%);stroke-opacity:1;stroke-miterlimit:10;\" d=\"M 178.898438 111.125 L 250.105469 250.003906 \"/>\n",
+       "<path style=\"fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(26.666667%,26.666667%,26.666667%);stroke-opacity:1;stroke-miterlimit:10;\" d=\"M 250.105469 250.003906 L 321.136719 388.9375 \"/>\n",
+       "<path style=\"fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(26.666667%,26.666667%,26.666667%);stroke-opacity:1;stroke-miterlimit:10;\" d=\"M 321.136719 388.9375 L 191.09375 483 \"/>\n",
+       "<path style=\"fill-rule:nonzero;fill:rgb(100%,0%,0%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;\" d=\"M 321.429688 17 C 321.429688 23.902344 315.835938 29.5 308.929688 29.5 C 302.027344 29.5 296.429688 23.902344 296.429688 17 C 296.429688 10.097656 302.027344 4.5 308.929688 4.5 C 315.835938 4.5 321.429688 10.097656 321.429688 17 \"/>\n",
+       "<path style=\"fill-rule:nonzero;fill:rgb(0%,100%,0%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;\" d=\"M 495.5 357.019531 C 495.5 363.921875 489.902344 369.519531 483 369.519531 C 476.097656 369.519531 470.5 363.921875 470.5 357.019531 C 470.5 350.113281 476.097656 344.519531 483 344.519531 C 489.902344 344.519531 495.5 350.113281 495.5 357.019531 \"/>\n",
+       "<path style=\"fill-rule:nonzero;fill:rgb(74.509804%,74.509804%,74.509804%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;\" d=\"M 29.5 143.082031 C 29.5 149.984375 23.902344 155.582031 17 155.582031 C 10.097656 155.582031 4.5 149.984375 4.5 143.082031 C 4.5 136.175781 10.097656 130.582031 17 130.582031 C 23.902344 130.582031 29.5 136.175781 29.5 143.082031 \"/>\n",
+       "<path style=\"fill-rule:nonzero;fill:rgb(74.509804%,74.509804%,74.509804%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;\" d=\"M 191.398438 111.125 C 191.398438 118.027344 185.800781 123.625 178.898438 123.625 C 171.996094 123.625 166.398438 118.027344 166.398438 111.125 C 166.398438 104.222656 171.996094 98.625 178.898438 98.625 C 185.800781 98.625 191.398438 104.222656 191.398438 111.125 \"/>\n",
+       "<path style=\"fill-rule:nonzero;fill:rgb(74.509804%,74.509804%,74.509804%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;\" d=\"M 262.605469 250.003906 C 262.605469 256.90625 257.007812 262.503906 250.105469 262.503906 C 243.203125 262.503906 237.605469 256.90625 237.605469 250.003906 C 237.605469 243.097656 243.203125 237.503906 250.105469 237.503906 C 257.007812 237.503906 262.605469 243.097656 262.605469 250.003906 \"/>\n",
+       "<path style=\"fill-rule:nonzero;fill:rgb(74.509804%,74.509804%,74.509804%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;\" d=\"M 333.636719 388.9375 C 333.636719 395.839844 328.039062 401.4375 321.136719 401.4375 C 314.230469 401.4375 308.636719 395.839844 308.636719 388.9375 C 308.636719 382.035156 314.230469 376.4375 321.136719 376.4375 C 328.039062 376.4375 333.636719 382.035156 333.636719 388.9375 \"/>\n",
+       "<path style=\"fill-rule:nonzero;fill:rgb(74.509804%,74.509804%,74.509804%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;\" d=\"M 203.59375 483 C 203.59375 489.902344 197.996094 495.5 191.09375 495.5 C 184.191406 495.5 178.59375 489.902344 178.59375 483 C 178.59375 476.097656 184.191406 470.5 191.09375 470.5 C 197.996094 470.5 203.59375 476.097656 203.59375 483 \"/>\n",
+       "<g style=\"fill:rgb(0%,0%,0%);fill-opacity:1;\">\n",
+       "  <use xlink:href=\"#glyph0-1\" x=\"306.316406\" y=\"20.859375\"/>\n",
+       "</g>\n",
+       "<g style=\"fill:rgb(0%,0%,0%);fill-opacity:1;\">\n",
+       "  <use xlink:href=\"#glyph0-2\" x=\"480.5625\" y=\"360.929688\"/>\n",
+       "</g>\n",
+       "<g style=\"fill:rgb(0%,0%,0%);fill-opacity:1;\">\n",
+       "  <use xlink:href=\"#glyph0-3\" x=\"14.46875\" y=\"146.992188\"/>\n",
+       "</g>\n",
+       "<g style=\"fill:rgb(0%,0%,0%);fill-opacity:1;\">\n",
+       "  <use xlink:href=\"#glyph0-4\" x=\"176.382812\" y=\"114.984375\"/>\n",
+       "</g>\n",
+       "<g style=\"fill:rgb(0%,0%,0%);fill-opacity:1;\">\n",
+       "  <use xlink:href=\"#glyph0-5\" x=\"247.601562\" y=\"253.863281\"/>\n",
+       "</g>\n",
+       "<g style=\"fill:rgb(0%,0%,0%);fill-opacity:1;\">\n",
+       "  <use xlink:href=\"#glyph0-6\" x=\"318.5625\" y=\"392.851562\"/>\n",
+       "</g>\n",
+       "<g style=\"fill:rgb(0%,0%,0%);fill-opacity:1;\">\n",
+       "  <use xlink:href=\"#glyph0-7\" x=\"188.5625\" y=\"486.859375\"/>\n",
+       "</g>\n",
+       "</g>\n",
+       "</svg>\n"
+      ],
+      "text/plain": [
+       "<igraph.drawing.Plot at 0x7fa7442e1410>"
+      ]
+     },
+     "execution_count": 2,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "out_fig_name = \"graph_plot.png\"\n",
+    "\n",
+    "visual_style = {}\n",
+    "\n",
+    "# Define colors for nodes\n",
+    "node_colours = [\"red\", \"green\", \"grey\", \"grey\", \"grey\", \"grey\", \"grey\"]\n",
+    "g.vs[\"color\"] = node_colours\n",
+    "\n",
+    "# Set bbox and margin\n",
+    "visual_style[\"bbox\"] = (500,500)\n",
+    "visual_style[\"margin\"] = 17\n",
+    "\n",
+    "# # Scale vertices based on degree\n",
+    "# outdegree = g.outdegree()\n",
+    "visual_style[\"vertex_size\"] = 25\n",
+    "\n",
+    "# Set vertex lable size\n",
+    "visual_style[\"vertex_label_size\"] = 8\n",
+    "\n",
+    "# Don't curve the edges\n",
+    "visual_style[\"edge_curved\"] = False\n",
+    "\n",
+    "# Set the layout\n",
+    "layout_1 = g.layout_fruchterman_reingold()\n",
+    "visual_style[\"layout\"] = layout_1\n",
+    "\n",
+    "# Plot the graph\n",
+    "plot(g, out_fig_name, **visual_style)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Get the degree matrix and its inverse"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "matrix([[ 1.        ,  0.        ,  0.        ,  0.        ,  0.        ,\n",
+       "          0.        ,  0.        ],\n",
+       "        [ 0.        ,  1.        ,  0.        ,  0.        ,  0.        ,\n",
+       "          0.        ,  0.        ],\n",
+       "        [ 0.        ,  0.        ,  1.        ,  0.        ,  0.        ,\n",
+       "          0.        ,  0.        ],\n",
+       "        [ 0.        ,  0.        ,  0.        ,  0.33333333,  0.        ,\n",
+       "          0.        ,  0.        ],\n",
+       "        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.5       ,\n",
+       "          0.        ,  0.        ],\n",
+       "        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,\n",
+       "          0.33333333, -0.        ],\n",
+       "        [-0.        , -0.        , -0.        , -0.        , -0.        ,\n",
+       "         -0.        ,  1.        ]])"
+      ]
+     },
+     "execution_count": 3,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "import numpy as np\n",
+    "from numpy.linalg import inv\n",
+    "\n",
+    "D = np.matrix(np.array([[1,0,0,0,0,0,0], [0,1,0,0,0,0,0], [0,0,1,0,0,0,0], [0,0,0,3,0,0,0], [0,0,0,0,2,0,0], [0,0,0,0,0,3,0], [0,0,0,0,0,0,1]]))\n",
+    "Dinv = inv(D)\n",
+    "Dinv"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Get the adjacency matrix"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "matrix([[1, 0, 0, 0, 0, 0, 0],\n",
+       "        [0, 1, 0, 0, 0, 0, 0],\n",
+       "        [0, 0, 0, 1, 0, 0, 0],\n",
+       "        [1, 0, 1, 0, 1, 0, 0],\n",
+       "        [0, 0, 0, 1, 0, 1, 0],\n",
+       "        [0, 1, 0, 0, 1, 0, 1],\n",
+       "        [0, 0, 0, 0, 0, 1, 0]])"
+      ]
+     },
+     "execution_count": 4,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "A = np.matrix(np.array([[1,0,0,0,0,0,0], [0,1,0,0,0,0,0], [0,0,0,1,0,0,0], [1,0,1,0,1,0,0], [0,0,0,1,0,1,0], [0,1,0,0,1,0,1], [0,0,0,0,0,1,0]]))\n",
+    "A"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Multiply the inverse of D and A"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "matrix([[1.        , 0.        , 0.        , 0.        , 0.        ,\n",
+       "         0.        , 0.        ],\n",
+       "        [0.        , 1.        , 0.        , 0.        , 0.        ,\n",
+       "         0.        , 0.        ],\n",
+       "        [0.        , 0.        , 0.        , 1.        , 0.        ,\n",
+       "         0.        , 0.        ],\n",
+       "        [0.33333333, 0.        , 0.33333333, 0.        , 0.33333333,\n",
+       "         0.        , 0.        ],\n",
+       "        [0.        , 0.        , 0.        , 0.5       , 0.        ,\n",
+       "         0.5       , 0.        ],\n",
+       "        [0.        , 0.33333333, 0.        , 0.        , 0.33333333,\n",
+       "         0.        , 0.33333333],\n",
+       "        [0.        , 0.        , 0.        , 0.        , 0.        ,\n",
+       "         1.        , 0.        ]])"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "S = Dinv*A\n",
+    "S"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Label Propagation algorithm"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import sys\n",
+    "\n",
+    "def LabelPropagation(T, Y, diff, max_iter, labelled):\n",
+    "    \n",
+    "    # Initialize\n",
+    "    Y_init = Y\n",
+    "    Y1 = Y\n",
+    "    \n",
+    "    # Initialize convergence parameters\n",
+    "    n=0\n",
+    "    current_diff = sys.maxsize\n",
+    "    \n",
+    "    # Iterate till difference reduces below diff or till the maximum number of iterations is reached\n",
+    "    while current_diff > diff or n < max_iter:\n",
+    "        \n",
+    "        current_diff = 0.0\n",
+    "        # Set Y(t)\n",
+    "        Y0 = Y1\n",
+    "        \n",
+    "        # Calculate Y(t+1)\n",
+    "        Y1 = T*Y0\n",
+    "        \n",
+    "        # Clamp labelled data\n",
+    "        for i in range(Y_init.shape[0]):\n",
+    "            if i in labelled:\n",
+    "                for j in range(Y_init.shape[1]):\n",
+    "                    if i!=j:\n",
+    "                        Y1.A[i][j] = Y_init.A[i][j]\n",
+    "        \n",
+    "        # Get difference between values of Y(t+1) and Y(t)\n",
+    "        for i in range(Y1.shape[0]):\n",
+    "            for j in range(Y1.shape[1]):\n",
+    "                current_diff += abs(Y1.A[i][j] - Y0.A[i][j])\n",
+    "        \n",
+    "        n += 1\n",
+    "        \n",
+    "    return Y1"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Run label propagation"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "CPU times: user 7.18 ms, sys: 0 ns, total: 7.18 ms\n",
+      "Wall time: 7.69 ms\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%time\n",
+    "Y = np.matrix(np.array([[1,0], [0,1], [0,0], [0,0], [0,0], [0,0], [0,0]]))\n",
+    "L = LabelPropagation(S, Y, 0.0001, 100, [0,1])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Final label matrix"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "matrix([[1.  , 0.  ],\n",
+       "        [0.  , 1.  ],\n",
+       "        [0.75, 0.25],\n",
+       "        [0.75, 0.25],\n",
+       "        [0.5 , 0.5 ],\n",
+       "        [0.25, 0.75],\n",
+       "        [0.25, 0.75]])"
+      ]
+     },
+     "execution_count": 8,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "L"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Labels of unlabelled nodes"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "matrix([[0],\n",
+       "        [1],\n",
+       "        [0],\n",
+       "        [0],\n",
+       "        [0],\n",
+       "        [1],\n",
+       "        [1]])"
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "L.argmax(1)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.4"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
