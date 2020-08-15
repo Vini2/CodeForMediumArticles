@@ -12,4 +12,5 @@ Code snippets and Jupyter Notebooks for my [Medium](https://medium.com/@vijinima
 * [Composition-based Clustering of Metagenomic Sequences](https://towardsdatascience.com/composition-based-clustering-of-metagenomic-sequences-4e0b7e01c463)
 * [Newbies Guide to Python-igraph](https://towardsdatascience.com/newbies-guide-to-python-igraph-4e51689c35b4)
 * [The Best Weapon Combinations for The Legend of Zelda BOTW](https://towardsdatascience.com/the-best-weapon-combinations-for-the-legend-of-zelda-botw-ac9a54f0eb8a)
+* [How to Use DBSCAN Effectively](https://towardsdatascience.com/how-to-use-dbscan-effectively-ed212c02e62)
 * [Clustering Using Convex Hulls](https://towardsdatascience.com/clustering-using-convex-hulls-fddafeaa963c)
